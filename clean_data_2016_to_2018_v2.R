@@ -1,0 +1,58 @@
+##install.packages("RODBC")
+###install.packages("odbc")
+##library(RODBC)
+library(odbc)
+
+
+base_path <- "./wage rigidity/_data/_IRCMO"
+
+dir_path <- file.path(base_path, as.character(2016))
+
+DataBase <- list.files(dir_path, pattern = "Rectificada.MDB", full.names = TRUE)
+
+print(DataBase)
+
+
+connection <- dbConnect(odbc::odbc(), Driver = "Microsoft Access Driver (*.mdb, *.accdb)",
+                        DBQ = DataBase)
+
+table_name <- "Año_2016"
+ponderators <- "Ponderadores"
+
+consult_instruction <- "SELECT Año_2016.*, 
+       Ponderadores.IR_Wtam, 
+       Ponderadores.IR_Wcat, 
+       Ponderadores.IR_Wsex, 
+       Ponderadores.IR_Wgru, 
+       Ponderadores.IR_Wi, 
+       Ponderadores.ICMO_Wtam, 
+       Ponderadores.ICMO_Wcat, 
+       Ponderadores.ICMO_Wsex, 
+       Ponderadores.ICMO_Wgru, 
+       Ponderadores.ICMO_Wi
+FROM Año_2016
+INNER JOIN Ponderadores ON Año_2016.Tamaño = Ponderadores.Tamaño
+                      AND Año_2016.Categoría = Ponderadores.Categoría
+                      AND Año_2016.Sexo = Ponderadores.Sexo
+                      AND Año_2016.Grupo = Ponderadores.Grupo;"
+
+
+df <- dbGetQuery(connection, consult_instruction)
+
+dbDisconnect(connection)
+
+
+colnames(df) <- tolower(colnames(df))
+
+
+cols_to_drop = c("ro_t_1", "ho_t_1", "c_t_1", "ht_t_1")
+
+df <- df[, !names(df) %in% cols_to_drop]
+
+
+previous_vars <- c("año","id_empresa" ,"tamaño", "categoría", "división","ro_t", "ho_t", "ht_t", "c_t")
+new_var_names <- c("anio", "id" ,"tamano", "categoria", "div", "ro", "ho", "ht", "c")
+
+df <- df %>% rename_with(~new_var_names, all_of(previous_vars))
+df <- df[, c("anio", "mes", "id", "tamano", "categoria", "sexo", "grupo", "div", "ro", "ho", "c", "ht")]
+write.csv(df, file = file.path(dir_path, paste0(2016, "_combined_r.csv")), row.names = FALSE, quote = FALSE)
