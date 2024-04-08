@@ -2,7 +2,7 @@
 ###install.packages("odbc")
 ##library(RODBC)
 library(odbc)
-
+library(tidyverse)
 
 base_path <- "./wage rigidity/_data/_IRCMO"
 
@@ -55,4 +55,5 @@ new_var_names <- c("anio", "id" ,"tamano", "categoria", "div", "ro", "ho", "ht",
 
 df <- df %>% rename_with(~new_var_names, all_of(previous_vars))
 df <- df[, c("anio", "mes", "id", "tamano", "categoria", "sexo", "grupo", "div", "ro", "ho", "c", "ht")]
+
 write.csv(df, file = file.path(dir_path, paste0(2016, "_combined_r.csv")), row.names = FALSE, quote = FALSE)
