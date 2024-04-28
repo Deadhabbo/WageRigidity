@@ -46,7 +46,7 @@ for (yy in years) {
   csv_file <- list.files(dir_path, pattern = paste0("\\d{4}\\.csv"), full.names = TRUE)
   
   if (!is_empty(csv_file)) {
-    df <- import(csv_file)
+    df <- import(csv_file, decimal.mark = ",")
     
     # Renaming columns to var_monthnum
     df <- rename_month_columns(df)
@@ -89,7 +89,7 @@ for (yy in years) {
     stacked_df <- stacked_df[, c("ano", "mes", "id", "tamano", "categoria", "sexo", "grupo", "div", "ro", "ho", "c", "nt")]
     
     # Write the combined dataframe to a new CSV file
-    write.csv(stacked_df, file = file.path(dir_path, paste0(yy, "_combined_r.csv")), row.names = FALSE, quote = FALSE)
+    write.table(stacked_df, file = file.path(dir_path, paste0(yy, "_combined_r.csv")), row.names = FALSE, quote = FALSE, sep = ";")
   } else {
     print(paste("File not found for year", yy))
   }
