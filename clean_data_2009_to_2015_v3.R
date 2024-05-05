@@ -38,7 +38,6 @@ rename_month_columns <- function(data_frame) {
 }
 
 
-
 for (yy in years) {
   print(paste("Processing year:", yy))
   
@@ -48,16 +47,6 @@ for (yy in years) {
   
   if (!is_empty(csv_file)) {
     df <- import(csv_file, decimal.mark = ",")
-    # columns_to_convert <- c(
-    #   "RO (ENE)", "RO (FEB)", "RO (MAR)", "RO (ABR)", "RO (MAY)", "RO (JUN)", "RO (JUL)", "RO (AGO)", "RO (SEP)", "RO (OCT)", "RO (NOV)", "RO (DIC)",
-    #   "HO (ENE)", "HO (FEB)", "HO (MAR)", "HO (ABR)", "HO (MAY)", "HO (JUN)", "HO (JUL)", "HO (AGO)", "HO (SEP)", "HO (OCT)", "HO (NOV)", "HO (DIC)",
-    #   "C (ENE)", "C (FEB)", "C (MAR)", "C (ABR)", "C (MAY)", "C (JUN)", "C (JUL)", "C (AGO)", "C (SEP)", "C (OCT)", "C (NOV)", "C (DIC)",
-    #   "NT (ENE)", "NT (FEB)", "NT (MAR)", "NT (ABR)", "NT (MAY)", "NT (JUN)", "NT (JUL)", "NT (AGO)", "NT (SEP)", "NT (OCT)", "NT (NOV)", "NT (DIC)"
-    # )
-    # 
-    # # Convert specific columns to float64
-    # df <- df %>%
-    #   mutate_at(vars(columns_to_convert), as.numeric)
     str(df)
     # Renaming columns to var_monthnum
     df <- rename_month_columns(df)

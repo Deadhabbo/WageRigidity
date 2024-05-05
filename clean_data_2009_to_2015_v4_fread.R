@@ -1,12 +1,11 @@
 library(tidyverse)
-library(rio)
+library(data.table)
 
 # Define the years, months, and the variable names of interest
 years <- 2009:2015
 MONTHS <- c("ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic")
 VARS_OF_INTEREST <- c("ro", "ho", "re", "he", "c", "nt")
 MONTHS_DICT <- setNames(sprintf("%02d", 1:12), tolower(MONTHS)) 
-
 
 # Base path for data
 base_path <- "./wage rigidity/_data/_IRCMO"
@@ -37,8 +36,6 @@ rename_month_columns <- function(data_frame) {
   return(data_frame)
 }
 
-
-
 for (yy in years) {
   print(paste("Processing year:", yy))
   
@@ -47,18 +44,9 @@ for (yy in years) {
   csv_file <- list.files(dir_path, pattern = paste0("\\d{4}\\.csv"), full.names = TRUE)
   
   if (!is_empty(csv_file)) {
-    df <- import(csv_file, decimal.mark = ",")
-    # columns_to_convert <- c(
-    #   "RO (ENE)", "RO (FEB)", "RO (MAR)", "RO (ABR)", "RO (MAY)", "RO (JUN)", "RO (JUL)", "RO (AGO)", "RO (SEP)", "RO (OCT)", "RO (NOV)", "RO (DIC)",
-    #   "HO (ENE)", "HO (FEB)", "HO (MAR)", "HO (ABR)", "HO (MAY)", "HO (JUN)", "HO (JUL)", "HO (AGO)", "HO (SEP)", "HO (OCT)", "HO (NOV)", "HO (DIC)",
-    #   "C (ENE)", "C (FEB)", "C (MAR)", "C (ABR)", "C (MAY)", "C (JUN)", "C (JUL)", "C (AGO)", "C (SEP)", "C (OCT)", "C (NOV)", "C (DIC)",
-    #   "NT (ENE)", "NT (FEB)", "NT (MAR)", "NT (ABR)", "NT (MAY)", "NT (JUN)", "NT (JUL)", "NT (AGO)", "NT (SEP)", "NT (OCT)", "NT (NOV)", "NT (DIC)"
-    # )
-    # 
-    # # Convert specific columns to float64
-    # df <- df %>%
-    #   mutate_at(vars(columns_to_convert), as.numeric)
+    df <- fread(csv_file, dec = ",")
     str(df)
+    
     # Renaming columns to var_monthnum
     df <- rename_month_columns(df)
     colnames(df) <- tolower(colnames(df))
@@ -84,18 +72,18 @@ for (yy in years) {
       print(month_vars)
       stable_col = c("id", "tamano", "categoria", "sexo", "grupo", "div")
       month_df <- df %>% select(stable_col, all_of(month_vars)) 
-
+      
       if (ncol(month_df) > 0) {
         month_df$mes <- as.integer(month_num)
         month_df$ano <- yy
         # Rename the month-specific columns to generic names without the month number
         month_df <- month_df %>% rename_with(~VARS_OF_INTEREST, all_of(month_vars))
-        # # Stack or concatenate this month's dataframe with the accumulated dataframe
+        # Stack or concatenate this month's dataframe with the accumulated dataframe
         stacked_df <- rbind(stacked_df, month_df)
       }
       
     }
-
+    
     stacked_df <- subset(stacked_df, select = -c( re, he))
     stacked_df <- stacked_df[, c("ano", "mes", "id", "tamano", "categoria", "sexo", "grupo", "div", "ro", "ho", "c", "nt")]
     
@@ -105,4 +93,3 @@ for (yy in years) {
     print(paste("File not found for year", yy))
   }
 }
-

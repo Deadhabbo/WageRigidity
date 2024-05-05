@@ -1,6 +1,5 @@
 library(tidyverse)
-library(rio)
-
+library(data.table)
 
 years <- 2010:2015
 
@@ -10,17 +9,14 @@ base_path <- "./wage rigidity/_data/_IRCMO"
 
 df_2009_path <- paste(base_path, "/2009/2009_combined_r.csv", sep = "")
 
-combined <- read.csv(df_2009_path, dec = ",", sep = ";")
+combined <- fread(df_2009_path, sep = ";", colClasses = c("integer", "character", rep("double", 10)))
 str(combined)
-
 
 for (year in years) {
   df_2_path_prev <- sprintf("/%d/%d_combined_r.csv", year, year)
   df_2_path <- paste(base_path, df_2_path_prev, sep = "")
-  df_to_add <- read.csv(df_2_path, dec = ",", sep = ";")
-  combined <- bind_rows(combined, df_to_add)
+  df_to_add <- fread(df_2_path, sep = ";", colClasses = c("integer", "character", rep("double", 10)))
+  combined <- rbind(combined, df_to_add)
 }
 
-
 write.table(combined, file = file.path(base_path, "Base_Anual_2009/combined_2009.csv"), row.names = FALSE, quote = FALSE, sep = ";")
-
