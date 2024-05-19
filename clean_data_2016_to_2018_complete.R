@@ -43,7 +43,6 @@ INNER JOIN Ponderadores ON Año_%s.Tamaño = Ponderadores.Tamaño
                       AND Año_%s.Grupo = Ponderadores.Grupo;", year_str, year_str, year_str, year_str, year_str, year_str)
   
   df <- dbGetQuery(connection, consult_instruction)
-  ##dbDisconnect(connection)
   
   colnames(df) <- tolower(colnames(df))
 

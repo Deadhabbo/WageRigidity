@@ -61,7 +61,7 @@ for (yy in years) {
     df <- df %>% rename_with(~new_names, all_of(old_names))
     
     # Initialize an empty dataframe for the stacked data
-    stacked_df <- data.frame()
+    
     
     for (month in MONTHS) {
       month_num <- MONTHS_DICT[tolower(month)]
